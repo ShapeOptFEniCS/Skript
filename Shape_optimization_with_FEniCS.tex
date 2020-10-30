@@ -1,0 +1,103 @@
+\documentclass[a4paper, 12pt]{scrartcl}
+\usepackage{ngerman}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{amsmath,amssymb,amstext}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[automark]{scrpage2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% user defined commands
+%%%
+
+%%% \mygraphics{}{}{}
+%% usage:   \mygraphics{width}{filename_without_extension}{caption}
+%% example: \mygraphics{0.7\textwidth}{rolling_grandma}{This is my grandmother on inlinescates}
+%% requires: package graphicx
+%% provides: including centered pictures/graphics with a boldfaced caption below
+%% 
+\newcommand{\mygraphics}[3]{
+  \begin{center}
+    \includegraphics[width=#1, keepaspectratio=true]{#2} \\
+    \textbf{#3}
+  \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% define the titlepage
+%%%
+
+\subject{Shape optimization with FEniCS}
+\titlehead{Programmier Praktikum WS2020/2021}
+
+\title{Gemeinsame Dokumentation 
+	\vspace{1cm}
+	\mygraphics{0.7\textwidth}{shop1}{}
+}
+\author{Dozent: Dr. Martin Lenz}
+\date{Bonn, am \today{}}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% set heading and footer
+%%%
+\pagestyle{scrheadings}
+\ifoot[]{Shape optimization with FEniCS - Gemeinsame Dokumentation}
+\cfoot[]{}
+\ofoot[]{\pagemark}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% begin the document
+%%%
+
+\begin{document}
+
+% \pagenumbering{roman} %% small roman page numbers
+
+%%% include the title
+% \thispagestyle{empty}  %% no header/footer (only) on this page
+ \maketitle
+%%% start a new page and display the table of contents
+%\newpage
+%\tableofcontents
+
+ 
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% begin main document
+%%% structure: \section \subsection \subsubsection \paragraph \subparagraph
+%%%
+
+\section{28.10.2020 - Einführung in die Form Optimierung}
+
+
+Hier beginnt die erste Seite
+
+
+
+
+%\section{04.11.2020 - ...}
+%\section{11.11.2020 - ...}
+%\section{18.11.2020 - ...}
+%\section{25.11.2020 - ...}
+%\section{02.12.2020 - ...}
+%\section{09.12.2020 - ...}
+% ...
+
+
+
+
+
+\end{document}
