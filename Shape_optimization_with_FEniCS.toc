@@ -1,7 +1,0 @@
-\contentsline {section}{\numberline {1}28.10.2020 -Einf\"uhrung in die Form Optimierung}{3}% 
-\contentsline {section}{\numberline {2}04.11.2020 - ...}{3}% 
-\contentsline {section}{\numberline {3}11.11.2020 - ...}{3}% 
-\contentsline {section}{\numberline {4}18.11.2020 - ...}{3}% 
-\contentsline {section}{\numberline {5}25.11.2020 - ...}{3}% 
-\contentsline {section}{\numberline {6}02.12.2020 - ...}{3}% 
-\contentsline {section}{\numberline {7}09.12.2020 - ...}{3}% 
