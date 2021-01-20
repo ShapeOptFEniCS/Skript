@@ -1,0 +1,302 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Dies ist unser Gemeinsames Skript zum Programmierpraktikum
+%%% Shape Optimization with FEniCS im WS20/21
+%%% Fügt gerne noch Pakete hinzu und definiert eure eigenen Befehle,
+%%% das ganze sollte aber trotzdem übersichtlich und lesbar bleiben.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% include packages and libraries
+%%%
+\documentclass[a4paper, 12pt]{scrartcl}
+\usepackage{ngerman}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{amsmath,amssymb,amstext}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{patterns}
+\usepackage{dsfont}
+\usetikzlibrary{arrows,calc,shapes,decorations.pathreplacing}
+\usepackage[automark]{scrlayer-scrpage}
+
+%Bjoerns packages
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage{changes}
+\newcommand{\TODO}[1]{{\color{red} TODO #1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% user defined commands
+%%%
+\newtheorem*{Bsp}{Beispiel}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dx}{\mathop{dx}}
+\newcommand{\ds}{\mathop{ds}}
+\newcommand{\Jhat}{\widehat{J}}
+\DeclareMathOperator{\divergence}{div}
+\tikzset{
+	schraffiert/.style={pattern=north east lines,pattern color=#1},
+	schraffiert/.default=black
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% define the titlepage
+%%%
+
+\subject{Shape optimization with FEniCS}
+\titlehead{Programmier Praktikum WS2020/2021}
+
+\title{Gemeinsame Dokumentation 
+	\vspace{1cm}
+	\mygraphics{0.7\textwidth}{graphics/shop1}{}
+}
+\author{Dozent: Dr. Martin Lenz}
+\date{Bonn, am \today{}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% set heading and footer
+%%%
+\pagestyle{scrheadings}
+\ifoot[]{Shape optimization with FEniCS - Gemeinsame Dokumentation}
+\cfoot[]{}
+\ofoot[]{\pagemark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% begin the document
+%%%
+
+\begin{document}
+	\section{Visualisierung des Tapes}
+	Die Fragestellung dieses Abschnittes ist: Wie lässt man sich das Tape, das Dolfin adjoint erstellt, anzeigen?
+	Der Befehl, den man dafür verwendet lautet: \verb|get_working_tape()| um die entsprechende Instanz zu erzeugen. %Die Instanz gibt es schon, man bekommt nur Zugriff drauf 
+	Wichtig dabei ist, dass man den Befehl im Code erst an einer Stelle einfügt nachdem alle relevanten Rechnungen (die man später visualisiert haben möchte) ausgeführt wurden. In unserem Fall heißt das also den Aufruf erst nach der Berechnung von \verb|Jhat| einzufügen, genauso wie in Abbildung \ref{Abb_1}. Wir können jetzt auf der Instanz des Tapes den Befehl \verb|visualise| ausführen, dieser Befehl kann mehrere Parameter erhalten, für unseren Fall reicht es den Zielordner anzugeben (hier heißt der Zielordner: tape). Damit erklärt sich die Eingabe von \\ \verb|get_working_tape().visualise("tape")|,
+%	\begin{verbatim}
+%	 	get_working_tape().visualise("tape")
+%	\end{verbatim}
+	wie in Abbildung \ref{Abb_1}. Wir benötigen nichts weiteres aus der Instanz des Tapes, also beenden wir das Programm mit \verb|exit(0)|. Damit die Visualisierung funktioniert muss außerdem TensorFlow in Python installiert sein.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics{Bild_1}
+		\caption{Positionierung von get\_working\_tape() im Code}
+		\label{Abb_1}
+	\end{figure}
+	Führt man das Programm um die so ergänzten Zeilen aus, so erscheinen im Terminal zusätzliche Ausgaben wie in Abbildung \ref{Abb_2}:
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics{Bild_2}
+		\caption{Zusätzliche Ausgaben}
+		\label{Abb_2}
+	\end{figure}
+	Folgt man diesen Anweisungen, also zuerst das Ausführen von
+	\\
+	\verb|tensorboard --logdir=tape| im Terminal und dann das Öffnen des angegeben Links in einem Browser, so gelangt man zur Darstellung des Codes in einer Art Baumdiagramm, für unser Beispiel ist der Baum in Abbildung \ref{Abb_3} zu sehen.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics{Bild_3}
+		\caption{Baumdiagramm unseres Algorithmuses}
+		\label{Abb_3}
+	\end{figure}
+	In diesem Diagramm kann man jetzt durch Doppelklicken auf die verschiedenen Knoten \glqq Untermenüs\grqq{} öffnen, dort stehen zusätzliche Informationen, beispielsweise Namen von Funktionen, von Konstanten, ... (sofern man natürlich entsprechende Namen im Code vergeben hat). Außerdem kann das Diagramm übersichtlicher gestalten werden, indem uninteressante Knoten aus dem Hauptgraphen, mittels Rechtsklick und Auswählen der Option \glqq remove from main graph\grqq{}, entfernt werden.
+	
+	Eine weitere Möglichkeit Übersicht im Graphen zu erhalten ist, bereits das Tape in kleinere logische Blöcke zu zerlegen. Dies wird mit der Codezeile \\ \verb|with get_working_tape().name_scope{...}| erreicht (dem Befehl wird ein Name in geschweiften Klammern übergeben). Anschaulich gesprochen schreibt das Programm alles was in der selben Zeile hinter \verb|with| (oder eingerückt unterhalb) von \verb|with| steht in einen eigenen Knoten und versteckt quasi Neben- oder Unterrechnungen. Der Graph für unser Beispiel sieht dann aus wie in Abbildung \ref{Abb_4}.
+	\begin{figure}[H]
+		\centering
+		\includegraphics{Bild_4}
+		\caption{Baumdiagramm mit verborgener Rechnung im Knoten constraint}
+		\label{Abb_4}
+	\end{figure}
+	Klappt man jetzt den Knoten \glqq constraint\grqq{} auf so erscheint wieder der vollständige Baum.
+
+
+	\section{Adjoint ohne dolfin-adjoint}
+	Die Frage, die in diesem Abschnitt beantwortet werden soll ist: Wie können wir unseren Algorithmus schreiben, ohne dolfin-adjoint zu verwenden?
+	
+	Das mathematische Problem welches dieser Fragestellung zu Grunde liegt ist jenes aus der ersten Vorlesung unseres Praktikums. Kurz noch einmal zur Wiederholung: Wir wollen das Funktional
+	\[
+		J (u,v)
+	\]
+	bezüglich v minimieren. Dabei ist das $u$, welches zu $v$ gehört gegeben als der Minimierer von
+	\[
+		E(u,v)
+	\]
+	In unserer Anwendung sind die Variablen so zu verstehen:
+	\begin{figure}[H]
+		\centering
+	\begin{tabular}[h]{c|c}
+		Name & Bedeutung \\ \hline
+		u & elastische Verschiebung
+		\\
+		v & Phasenfeld
+		\\
+		$J$ & Zielfunktional
+		\\
+		$E$ & elastische Energie
+	\end{tabular}
+\end{figure}
+	Wenn wir einen eindeutigen Minimierer von $E(u,v)$ für ein $v$ finden so hängt dieser nur von $v$ ab und wir bezeichnen diesen mit $u(v)$, dann können wir vereinfacht schreiben: 
+	\begin{equation*}
+		\Jhat(v):=J(u(v),v).
+	\end{equation*}
+	
+	Eine Anmerkung zur Notation: der Ausdruck $\Jhat_{,v}(v)$ bezeichnet die Ableitung von $\Jhat$ nach $v$ in eine beliebige Richtung. Der Ausdruck $E_{,uv}(u,v)p$ hingegen bezeichnet die zweimalige Ableitung von $E$, einmal nach $u$ in die Richtung $p$ und einmal nach $v$ (wieder in beliebige Richtung).
+	
+	In vergangenen Vorlesungen haben wir bereits gesehen, dass gilt:
+	\begin{gather}
+		\Jhat_{,v}(v) = E_{,uv}(u,v)p+ J_{,v}(u,v)
+		\label{Grundproblem}
+	\end{gather}
+	(es ist zu beachten, dass die beliebige Ableitungsrichtung in $\Jhat_{,v}$ und in $J_{,v}$ die selbe ist!)
+	
+	Wir kennen $u$ und $p$ aus der Gleichung \ref{Grundproblem} nicht. Diese müssen wir wie folgt berechnen:
+	\begin{align*}
+		u \text{ ist definiert durch: }&&E_{,u}(u,v)&=0
+		\\
+		p \text{ ist definiert durch: }&&E_{,uu}(u,v)p&=-J_{,u}(u,v) (\rightarrow \text{ linear in }p)
+	\end{align*}
+	Natürlich müssen wir alles in vernünftiger Reihenfolge berechnen, unser Problem folgt also diesem mathematischen Ablauf:
+	\begin{itemize}
+		\item [1.] Berechne $u$ aus $E_{,u}(u,v)=0$
+		\item [2.] berechne $p$ aus $E_{,uu}(u,v)p=-J_{,u}(u,v)$
+		\item [3.] berechne $\Jhat_{,v}$ aus $\Jhat_{,v}(v) = E_{,uv}(u,v)p+ J_{,v}(u,v)$
+	\end{itemize}
+	Wir können diesen Ablauf in FENICS so formulieren:
+	\begin{itemize}
+		\item [1.] \begin{verbatim}duE = derivative(E,u)
+		solve(duE==0,...) \end{verbatim}
+		\item [2.] \begin{verbatim}duduE = derivative(duE, u)
+		duJ = derivative(J,u)
+		p = TrialFunction(...)
+		solve(action(duduE, p) == -duJ,...) \end{verbatim}
+		\item [3.] \begin{verbatim}dvJhat = derivative(action(duE,p),v) + derivative(J,v)
+		g = Function(...)
+		assemble(dvJhat, tensor = g.vector())\end{verbatim}
+	\end{itemize}
+	\subsection{lineares Gleichungssystem statt Newton-Verfahren}
+	
+	Wir sehen die Implementierung ist in ihrer Formulierung sehr nahe an der mathematischen Formulierung, nichtsdestotrotz ist dieser Ablauf genau das was dolfin-adjoint auch berechnet, wir wollen ja aber schneller werden mit unserem Algorithmus. Wir erreichen das, dadurch, dass wir unser Problem mathematisch weiter vereinfachen (was dolfin-adjoint nicht kann). Wir beobachten zuerst:
+	\begin{equation}
+		E = \underbrace{\text{stored }}_{\text{quadratisch in }u}- \underbrace{\text{ compliance}}_{\text{linear in }u}
+		\label{Grundgleichung}
+	\end{equation}
+	Wir können das ausnutzen, d.h. $E_{,u}$  ist affin in $u$ (beim Ableiten wird der $u^2$-Term zu einem $u$-Term und der $u$-Term wird konstant), also ist $E_{,u}$ ein lineares Gleichungssystem. In FENICS formuliert sich das so:
+	\begin{verbatim}
+	ut = TrialFunction()
+	duE2 = replace(duE, {u:ut})
+	solve(lhs(duE2)==rhs(duE2),...)
+	\end{verbatim}
+	Dieses Umschreiben bringt uns den Vorteil, dass wir statt einem Newton-Löser wie im Ablauf unter Punkt 1. zu sehen, nun nur ein lineares Gleichungssystem lösen müssen.
+
+
+	\subsection{Ersetzen von lhs(...) und rhs(...)}
+	Um das noch weiter zu verbessern betrachten wir genau was in \verb|lhs(duE2)| steht: Das ist definiert als die erste Ableitung von $E$, wobei darin der Ausdruck $u$ durch den Ausdruck $ut$ ersetzt wurde. Weiterhin bleiben, durch den Befehl \verb|lhs(...)|, in \verb|lhs(duE2)| nur die Teile stehen, in denen $ut$ vorkommen. Wir behaupten jetzt das gilt:
+	\begin{verbatim}
+		lhs(duE2) = action(duduE,ut)
+	\end{verbatim}
+	Das erklärt sich, wenn man sich überlegt was in \verb|action(duduE,ut)| passiert: Wir leiten $E$ zweimal ab und setzt in für eine Ableitungsrichtung $ut$ ein. Anhand eines Beispiels wird deutlicher was passiert:
+	\begin{Bsp}
+		Sei $E(u) = au^2+bu+c\implies duE(u)=2au+b$ wir rechnen beide Möglichkeiten durch:
+		\begin{figure}[H]
+			\centering
+				\begin{tabular}{cc}
+					\verb|lhs(duE2)| & \verb|action(duduE,ut)| \\
+					ersetze in $duE$ $u$ durch $ut\rightarrow$ $2aut+b$ & leite $duE$ nach $u$ ab $\rightarrow$ $duduE=2a$
+					\\
+					verwende nur Terme mit $ut\rightarrow$ $2aut$ & setzte $ut$ als Ableitungsrichtung$\rightarrow$ $2aut$
+				\end{tabular}
+			\\
+			$\implies$ \verb|lhs(duE2) = action(duduE,ut)|
+		\end{figure}
+	\end{Bsp}
+Insgesamt gilt diese Gleichheit da \verb|duE2| linear in $u$ ist.
+
+Mit einer ähnlichen Argumentation lässt sich auch \verb|rhs(duE2)| umformulieren: Die rechte Seite ist der Konstante Term von $duE2$ und wir wissen, dieser Term kommt aus der Compliance, genauer: es ist die Ableitung der Compliance. Wir erhalten also:
+\begin{verbatim}
+	rhs(duE2)=-(-derivative(Comp,u))=derivative(Comp,u)
+\end{verbatim}	
+(ein Minuszeichen kommt aus der Gleichung \ref{Grundgleichung} und das andere aus der Äquivalenzumformung die in \verb|rhs(...)| passiert.). Wir können also unseren schon modifizierten 1. Schritt weiter umformulieren, indem man schreibt:
+\begin{verbatim}
+	duC = derivative(Comp,u)
+	solve(action(duduE,ut)==duC,...)
+\end{verbatim}
+Was haben wir dadurch erreicht? Auf den ersten Blick haben wir unsere Gleichungen nur umgeformt, was uns natürlich nichts an Rechenleistung erspart, dennoch ist etwas sehr nützliches passiert: Betrachten wir unseren Ablauf aus dem ursprünglichen FENICS-Code, dort steht unter Punkt 2.: \verb|solve(action(duduE,p)==-duJ,...)|, d.h. Unsere Gleichungssysteme in Schritt 1. (nach dem Umformulieren) und in Schritt 2. sind zumindest schon auf der linken Seite identisch (beidesmal steht dort: \verb|action(duduE,p)|). Betrachten wir die rechte Seite noch etwas genauer, dort steht \verb|-duJ|. Wir wissen bereits wie sich $J$ zusammensetzt:
+\[
+	J = \underbrace{\text{phaseField}}_{\text{abhängig von }v} + \underbrace{\text{compliance}}_{\text{abhängig von }u}
+\]
+Wenn wir jetzt aber $J$ nach $u$ ableiten fällt der Phasenfeldterm komplett weg, da dieser ja nur von $v$ abhängt, es gilt also:
+\begin{verbatim}
+	duJ = duC
+\end{verbatim}
+Tatsächlich sind also auch die rechten Seiten der zwei Gleichungen sehr ähnlich, sie unterscheiden sich nur um den Faktor $-1$. An diesem Punkt können wir uns nun aber Rechenarbeit sparen, man muss natürlich nicht zweimal das (fast) gleiche Gleichungssystem lösen, da bis auf ein $-1$ in Schritt 2 alles gleich bleibt, sparen wir uns das rechnen und geben als Lösung des Gleichungssystems nur $-1$-mal die Lösung aus Schritt 1 an. Wir ersetzten also Schritt 2 durch
+\begin{verbatim}
+	p.assign(-ut)
+\end{verbatim}
+Wenn wir jetzt unsere Erkenntnisse zusammenfassen erhalten wir:
+\begin{itemize}
+	\item [1.] \begin{verbatim}duE = derivative(E,u), duduE, duC
+	solve(action(duduE,ut)==duC,...) \end{verbatim}
+	\item [2.] \begin{verbatim}p.assign(-ut) \end{verbatim}
+	\item [3.] \begin{verbatim}dvJhat = derivative(action(duE,p),v) + derivative(J,v)
+	g = Function(...)
+	assemble(dvJhat, tensor = g.vector())\end{verbatim}
+\end{itemize}
+Wir sehen: in Schritt 2. fehlt nun das Gleichungssystem, wir sparen uns somit also wirklich Rechenleistung.
+
+
+\subsection{scipy-minimize}
+Wenn wir uns dolfin-adjoint sparen wollen, dann dürfen wir nicht das minimize aus dem dolfin-adjoint Paket verwenden, sondern müssen mit dem scipy-minimize arbeiten. Das kann aber nicht direkt auf FENICS-Funktionen arbeiten, wir müssen also einiges umschreiben. Schauen wir zuerst was wir dem scipy-minimize übergeben müssen:
+\begin{verbatim}
+	scipy.minimize(Jhat, arr_v, jac=DJhat, ...)
+\end{verbatim}
+\begin{itemize}
+	\item Das Argument in dem optimiert werden soll, kann keine FENICS-Funktion sein. Das liegt daran, dass der \verb|scipy.minimize(...)| Befehl im $\mathbb{R}^n$ Vektorraum arbeitet und FENICS-Funktionen nicht automatisch in diesen Vektorraum übertragen werden. $\implies$ Wir müssen also aus unserer FENICS-Funktion \verb|v| in ein numpy-Vektor \verb|arr_v| transformieren.
+	\item \verb|Jhat| soll aber weiterhin eine FENICS-Funktion sein, nur wollen wir dieser jetzt \verb|arr_v| übergeben, also müssen wir am Beginn der Definition von \verb|Jhat| \verb|arr_v| in eine FENICS-Funktion umwandeln und am Ende einen Float zurückgeben.
+	\item Gleiches gilt auch für \verb|DJhat|: Auch hier übergeben wir der Funktion \verb|arr_v|, welches am Beginn wieder in eine FENICS-Funktion umgewandelt werden muss. Am Ende von \verb|Jhat| muss die FENICS-Funktion \verb|g| entsprechend wieder in eine numpy-Version umgewandelt werden.
+\end{itemize}
+Der Code um eine FENICS-Funktion in ein numpy-Array umzurechnen sieht wie folgt aus:
+\begin{verbatim}
+arr_v = v.vector().get_local()
+\end{verbatim}
+Und um aus einem numpy-Array eine FENICS-Funktion zu machen:
+\begin{verbatim}
+v.vector().set_local(arr_v)
+\end{verbatim}
+Außerdem müssen wir beachten, dass die Grenzen ebenfalls numpy-Arrays sein müssen, diese waren bisher ebenfalls FENICS-Funktionen. Außerdem müssen wir einmal transponieren, wir schreiben also:
+\begin{verbatim}
+bounds = transpose([arr_low_bound, arr_up_bound])
+\end{verbatim}
+\subsection{Parallelisierung mit MPI}
+Die Parallelisierung läuft in etwa so ab: In jedem Prozess läuft das selbe Python-Programm. Wird das Mesh aufgerufen, so partitioniert FENICS dieses und jeder Prozess erhält nur einen Teil der Freiheitsgrade. Das bedeutet jedoch, dass die Prozesse untereinander kommunizieren müssen und zwar genau an den Rändern der Aufteilung des Meshes. Beispielsweise müssen in jeder Iteration beim Lösen eines Gleichungssystems die Freiheitsgrade am Rand synchronisiert werden. Im Normalfall geschieht das alles von FENICS automatisiert. Wir müssen jetzt aber an einer Stelle aufpassen, das \verb|scipy.minimize(...)| arbeitet nicht automatisch parallel! Wir müssen also sicherstellen, dass jeder \verb|scipy.minimize(...)| Aufruf synchron mit allen diesen Aufrufen läuft, im Endeffekt mach zwar jeder dieser Aufrufe das selbe, das ist aber letztendlich der Art der Parallelisierung geschuldet. Wir parallelisieren quasi nur den FENICS-Teil des Codes und lassen den scipy-Teil auf jedem Prozess laufen. Wir müssen also an der Stelle der Umwandlung von FENICS zu scipy und Umgekehrt etwas modifizieren.
+
+Zuerst den Fall von einer FENICS-Funktion zu einem numpy-Array. Hier benötigen wir zu Beginn eine Liste aller globalen Indizes, diese erhalten wir durch:
+\begin{verbatim}
+	global_range = numpy.arange(V.dim(),dtype='I')
+\end{verbatim}
+In jedem Prozess muss dann folgendes ausgeführt werden, um den Koeffizientenvektor zusammen zu bauen:
+\begin{verbatim}
+	arr = fun.vector().gather(global_range)
+\end{verbatim}
+Betrachten wir nun die andere Richtung. Hier benötigen wir die lokalen Indizes:
+\begin{verbatim}
+	local_begin, local_end = fun.vector().local_range()
+\end{verbatim}
+Und jetzt setzen wir noch die Funktion aus den lokalen Indizes zusammen:
+\begin{verbatim}
+	fun.vector().set_local(arr[local_begin:local_end])
+	fun.vector().apply('insert')
+\end{verbatim}
+Dabei sorgt die letzte Zeile dafür, dass FENICS über veränderte Vektorwerte informiert wird.
+\end{document}
